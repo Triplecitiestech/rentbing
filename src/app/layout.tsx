@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { siteConfig } from "@/config/site";
+import {
+  LocalBusinessJsonLd,
+  OrganizationJsonLd,
+} from "@/components/seo/JsonLd";
 
 export const metadata: Metadata = {
   title: {
@@ -42,7 +46,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="font-sans antialiased">{children}</body>
+      <body className="font-sans antialiased">
+        <LocalBusinessJsonLd />
+        <OrganizationJsonLd />
+        {children}
+      </body>
     </html>
   );
 }

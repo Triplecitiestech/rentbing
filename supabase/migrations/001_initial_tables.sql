@@ -1,83 +1,70 @@
--- Contact form submissions
-CREATE TABLE IF NOT EXISTS contact_submissions (
+-- ============================================
+-- RentBing Database Schema
+-- Rental listing website for student housing
+-- ============================================
+
+-- Properties table
+CREATE TABLE IF NOT EXISTS properties (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT NOT NULL,
-  email TEXT NOT NULL,
-  phone TEXT,
-  message TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'contacted', 'resolved')),
+  address TEXT NOT NULL,
+  city TEXT NOT NULL DEFAULT 'Binghamton',
+  state TEXT NOT NULL DEFAULT 'NY',
+  zip TEXT NOT NULL DEFAULT '13901',
+  title TEXT NOT NULL,
+  description TEXT,
+  price TEXT NOT NULL,
+  bedrooms INTEGER NOT NULL DEFAULT 1,
+  bathrooms INTEGER NOT NULL DEFAULT 1,
+  square_feet INTEGER,
+  property_type TEXT NOT NULL DEFAULT 'Apartment',
+  status TEXT NOT NULL DEFAULT 'available' CHECK (status IN ('available', 'rented')),
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Rental inquiries (from property pages)
-CREATE TABLE IF NOT EXISTS rental_inquiries (
+-- Property images table
+CREATE TABLE IF NOT EXISTS property_images (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT NOT NULL,
-  email TEXT NOT NULL,
-  phone TEXT,
-  property_name TEXT,
-  move_in_date DATE,
-  message TEXT NOT NULL,
-  status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'contacted', 'qualified', 'converted')),
-  created_at TIMESTAMPTZ DEFAULT now()
+  property_id UUID NOT NULL REFERENCES properties(id) ON DELETE CASCADE,
+  image_url TEXT NOT NULL,
+  sort_order INTEGER NOT NULL DEFAULT 0
 );
 
--- Rental applications (multi-step form)
-CREATE TABLE IF NOT EXISTS rental_applications (
+-- Inquiries table (contact form submissions)
+CREATE TABLE IF NOT EXISTS inquiries (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  -- Step 1: Personal info
+  property_id UUID REFERENCES properties(id) ON DELETE SET NULL,
   first_name TEXT NOT NULL,
-  last_name TEXT NOT NULL,
-  email TEXT NOT NULL,
+  last_name TEXT,
   phone TEXT NOT NULL,
-  date_of_birth DATE,
-  current_address TEXT,
-  -- Step 2: Employment
-  employer TEXT,
-  job_title TEXT,
-  monthly_income NUMERIC,
-  employment_duration TEXT,
-  -- Step 3: Rental history
-  previous_landlord_name TEXT,
-  previous_landlord_phone TEXT,
-  previous_address TEXT,
-  reason_for_leaving TEXT,
-  -- Step 4: Property preference
-  desired_property TEXT,
-  desired_move_in DATE,
-  lease_term TEXT,
-  num_occupants INTEGER DEFAULT 1,
-  pets TEXT,
-  -- Meta
-  consent BOOLEAN NOT NULL DEFAULT false,
-  status TEXT NOT NULL DEFAULT 'submitted' CHECK (status IN ('draft', 'submitted', 'reviewing', 'approved', 'denied')),
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
--- Maintenance requests
-CREATE TABLE IF NOT EXISTS maintenance_requests (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name TEXT NOT NULL,
   email TEXT NOT NULL,
-  phone TEXT,
-  property_address TEXT NOT NULL,
-  unit_number TEXT,
-  category TEXT NOT NULL,
-  priority TEXT NOT NULL DEFAULT 'medium' CHECK (priority IN ('low', 'medium', 'high', 'emergency')),
-  description TEXT NOT NULL,
-  photo_urls JSONB DEFAULT '[]',
-  status TEXT NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'in_progress', 'completed')),
+  bedrooms TEXT[] DEFAULT '{}',
+  message TEXT,
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Enable RLS on all tables
-ALTER TABLE contact_submissions ENABLE ROW LEVEL SECURITY;
-ALTER TABLE rental_inquiries ENABLE ROW LEVEL SECURITY;
-ALTER TABLE rental_applications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE maintenance_requests ENABLE ROW LEVEL SECURITY;
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_properties_status ON properties(status);
+CREATE INDEX IF NOT EXISTS idx_property_images_property_id ON property_images(property_id);
+CREATE INDEX IF NOT EXISTS idx_property_images_sort_order ON property_images(property_id, sort_order);
+CREATE INDEX IF NOT EXISTS idx_inquiries_created_at ON inquiries(created_at DESC);
 
--- Service role can do everything (for API routes)
-CREATE POLICY "Service role full access" ON contact_submissions FOR ALL USING (true);
-CREATE POLICY "Service role full access" ON rental_inquiries FOR ALL USING (true);
-CREATE POLICY "Service role full access" ON rental_applications FOR ALL USING (true);
-CREATE POLICY "Service role full access" ON maintenance_requests FOR ALL USING (true);
+-- Enable RLS
+ALTER TABLE properties ENABLE ROW LEVEL SECURITY;
+ALTER TABLE property_images ENABLE ROW LEVEL SECURITY;
+ALTER TABLE inquiries ENABLE ROW LEVEL SECURITY;
+
+-- Public read access to properties and images
+CREATE POLICY "Public can read properties" ON properties FOR SELECT USING (true);
+CREATE POLICY "Public can read property images" ON property_images FOR SELECT USING (true);
+
+-- Service role can do everything (for API routes and admin)
+CREATE POLICY "Service role manages properties" ON properties FOR ALL
+  USING (true) WITH CHECK (true);
+CREATE POLICY "Service role manages images" ON property_images FOR ALL
+  USING (true) WITH CHECK (true);
+CREATE POLICY "Service role manages inquiries" ON inquiries FOR ALL
+  USING (true) WITH CHECK (true);
+
+-- Public can insert inquiries (contact form)
+CREATE POLICY "Public can submit inquiries" ON inquiries FOR INSERT
+  WITH CHECK (true);

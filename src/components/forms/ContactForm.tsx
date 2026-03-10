@@ -5,23 +5,42 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Textarea } from "@/components/ui/Textarea";
 
+const BEDROOM_OPTIONS = [
+  "Two Bedroom",
+  "Three Bedroom",
+  "Studio/One Bedroom",
+  "Other",
+];
+
 interface FormData {
-  name: string;
-  email: string;
+  first_name: string;
+  last_name: string;
   phone: string;
+  email: string;
+  bedrooms: string[];
   message: string;
 }
 
 export function ContactForm() {
   const [form, setForm] = useState<FormData>({
-    name: "",
-    email: "",
+    first_name: "",
+    last_name: "",
     phone: "",
+    email: "",
+    bedrooms: [],
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [loadedAt] = useState(Date.now());
+
+  function toggleBedroom(option: string) {
+    setForm((prev) => ({
+      ...prev,
+      bedrooms: prev.bedrooms.includes(option)
+        ? prev.bedrooms.filter((b) => b !== option)
+        : [...prev.bedrooms, option],
+    }));
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -32,26 +51,17 @@ export function ContactForm() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          _gotcha: "", // honeypot
-          _loadedAt: loadedAt,
-        }),
+        body: JSON.stringify(form),
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Something went wrong");
-      }
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
 
       setStatus("success");
-      setForm({ name: "", email: "", phone: "", message: "" });
+      setForm({ first_name: "", last_name: "", phone: "", email: "", bedrooms: [], message: "" });
     } catch (err) {
       setStatus("error");
-      setErrorMessage(
-        err instanceof Error ? err.message : "Failed to send message"
-      );
+      setErrorMessage(err instanceof Error ? err.message : "Failed to send");
     }
   }
 
@@ -62,14 +72,9 @@ export function ContactForm() {
           Message Sent!
         </h3>
         <p className="mt-2 text-sm text-secondary-300">
-          Thank you for reaching out. We&apos;ll get back to you within 24
-          hours.
+          Thank you for reaching out. We&apos;ll get back to you shortly.
         </p>
-        <Button
-          variant="ghost"
-          className="mt-4"
-          onClick={() => setStatus("idle")}
-        >
+        <Button variant="ghost" className="mt-4" onClick={() => setStatus("idle")}>
           Send Another Message
         </Button>
       </div>
@@ -80,51 +85,70 @@ export function ContactForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Input
-          id="name"
-          label="Name"
-          placeholder="Your full name"
+          id="first_name"
+          label="First name *"
           required
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          value={form.first_name}
+          onChange={(e) => setForm({ ...form, first_name: e.target.value })}
         />
         <Input
-          id="email"
-          label="Email"
-          type="email"
-          placeholder="you@example.com"
-          required
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          id="last_name"
+          label="Last name"
+          value={form.last_name}
+          onChange={(e) => setForm({ ...form, last_name: e.target.value })}
         />
       </div>
       <Input
         id="phone"
-        label="Phone (optional)"
+        label="Phone *"
         type="tel"
-        placeholder="(509) 555-0123"
+        required
         value={form.phone}
         onChange={(e) => setForm({ ...form, phone: e.target.value })}
       />
+      <Input
+        id="email"
+        label="Email *"
+        type="email"
+        required
+        value={form.email}
+        onChange={(e) => setForm({ ...form, email: e.target.value })}
+      />
+
+      {/* Bedroom preference checkboxes */}
+      <div>
+        <p className="mb-2 text-sm font-medium text-secondary-300">
+          How Many Bedrooms is your group looking for?
+        </p>
+        <div className="space-y-2">
+          {BEDROOM_OPTIONS.map((option) => (
+            <label key={option} className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.bedrooms.includes(option)}
+                onChange={() => toggleBedroom(option)}
+                className="h-4 w-4 rounded border-secondary-600 bg-secondary-800 text-primary-600 focus:ring-primary-500"
+              />
+              <span className="text-sm text-secondary-300">{option}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
       <Textarea
         id="message"
         label="Message"
-        placeholder="How can we help you?"
-        required
+        placeholder="Tell us what you're looking for..."
         value={form.message}
         onChange={(e) => setForm({ ...form, message: e.target.value })}
       />
-
-      {/* Honeypot — hidden from real users */}
-      <div className="absolute -left-[9999px]" aria-hidden="true">
-        <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" />
-      </div>
 
       {status === "error" && (
         <p className="text-sm text-red-400">{errorMessage}</p>
       )}
 
-      <Button type="submit" isLoading={status === "loading"} className="w-full sm:w-auto">
-        Send Message
+      <Button type="submit" isLoading={status === "loading"} className="w-full">
+        Submit
       </Button>
     </form>
   );

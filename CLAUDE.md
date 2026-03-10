@@ -1,4 +1,4 @@
-# CLAUDE.md — AI Assistant Guide for Rent Bing
+# CLAUDE.md — AI Assistant Guide for RentBing
 
 > **This is the single source of truth for every Claude Code session.** Read this file first. It tells you how to behave, how to ship, and how to avoid mistakes.
 
@@ -30,10 +30,27 @@ When the user corrects you or you learn a new project convention, update this fi
 
 ## Project Overview
 
-Rent Bing is a modern property management website and operational hub. It integrates with Buildium via its Open API to display properties, accept applications, and manage maintenance requests.
+**RentBing is a rental listing and marketing website**, NOT a property management platform. It displays available rental properties owned by the company, presents property photos, and allows visitors to submit rental inquiries. The target audience is Binghamton University students and graduate students looking for off-campus housing.
+
+**What this site IS:**
+- A marketing website for rental properties
+- A rental listing directory with photos, prices, and details
+- A contact/inquiry form for prospective tenants
+- A link hub to external Buildium portals for applications and tenant login
+
+**What this site is NOT:**
+- A tenant portal (use Buildium for that)
+- A maintenance ticketing system
+- An accounting or payment system
+- A property management dashboard
 
 **Production URL**: https://www.rentbing.com
 **Preview URL pattern**: https://<branch-name>-rentbing.vercel.app
+**Phone**: 607-484-7654
+
+**External Links:**
+- Application: https://rentbing1.managebuilding.com/Resident/rental-application/new/apply
+- Tenant Login: https://rentbing1.managebuilding.com/Resident/public/home
 
 ---
 
@@ -43,15 +60,27 @@ Rent Bing is a modern property management website and operational hub. It integr
 |-------|-----------|
 | **Framework** | Next.js 15 (App Router), React, TypeScript (strict) |
 | **Styling** | Tailwind CSS 4 with custom theme |
-| **Database** | Supabase (PostgreSQL + Auth + Storage) — direct client, no Prisma |
-| **Auth** | Supabase Auth (email/password for tenants, OAuth for admin) |
-| **Email** | Resend |
-| **Bot Protection** | Cloudflare Turnstile |
-| **Property Management** | Buildium Open API (Phase 4) |
-| **AI** | Anthropic Claude API (Phase 6) |
+| **Database** | Supabase (PostgreSQL + Storage) — direct client, no Prisma |
 | **Hosting** | Vercel |
+| **Email** | Resend (deferred — not yet configured) |
+| **Bot Protection** | Cloudflare Turnstile (deferred — not yet configured) |
 
 **Important**: This project does NOT use Prisma. All database access goes through the Supabase JS client (`@supabase/supabase-js` and `@supabase/ssr`).
+
+---
+
+## Database Schema
+
+Three tables in Supabase:
+
+| Table | Purpose |
+|-------|---------|
+| `properties` | Rental listings (address, title, price, bedrooms, bathrooms, status) |
+| `property_images` | Photos for each property (image_url, sort_order) |
+| `inquiries` | Contact form submissions (name, email, phone, bedroom preference, message) |
+
+SQL migration: `supabase/migrations/001_initial_tables.sql`
+Seed data: `supabase/seed.sql`
 
 ---
 
@@ -71,31 +100,26 @@ npm run lint         # ESLint (MUST PASS, fix all errors)
 ```
 src/
   app/
-    (marketing)/        # Public pages (home, properties, about, contact, apply)
-    portal/             # Tenant portal (auth required)
-    admin/              # Staff portal (admin auth)
+    (marketing)/        # Public pages (home, properties, contact)
     api/                # API route handlers
-    auth/               # Supabase auth pages
   components/
-    layout/             # Header, Footer, Navigation
-    sections/           # Hero, Features, CTA, Testimonials
-    ui/                 # Button, Card, Container, Input
-    shared/             # Section, FeatureCard, PageHero
-    properties/         # PropertyCard, PropertyGrid, PropertyDetail
-    forms/              # ContactForm, InquiryForm, ApplicationForm
-    portal/             # Tenant dashboard components
-    admin/              # Admin components
-    seo/                # JSON-LD schemas, Breadcrumbs, AIMetadata
+    layout/             # Header, Footer
+    sections/           # Hero, Features, CTA
+    ui/                 # Button, Card, Container, Input, etc.
+    shared/             # Section, PageHero, FeatureCard
+    properties/         # ImageGallery (with lightbox)
+    forms/              # ContactForm
+    seo/                # JSON-LD schemas
   lib/
     supabase/           # Supabase clients (server.ts, client.ts, admin.ts)
-  config/               # Site metadata, contact config
-  constants/            # Navigation, property types
+  config/               # Site metadata, external links
+  constants/            # Navigation
   types/                # TypeScript type definitions
   utils/                # cn.ts (clsx + tailwind-merge)
-  hooks/                # Custom React hooks
   middleware.ts         # Security headers, bot blocking
-tests/
-  e2e/                  # Playwright tests
+supabase/
+  migrations/           # SQL migrations
+  seed.sql              # Initial property data
 ```
 
 ---
@@ -112,6 +136,8 @@ tests/
 
 **Database**: Supabase JS client for all DB access. Use `createClient()` from `@/lib/supabase/server` in server components/API routes, `@/lib/supabase/client` in client components, `createAdminClient()` for service-role operations.
 
+**Images**: Property images stored in Supabase Storage, referenced via `property_images` table. Use responsive loading, lightbox for full-size viewing.
+
 ---
 
 ## Git Workflow
@@ -123,24 +149,14 @@ tests/
 
 ---
 
-## Implementation Phases
-
-### Phase 1 — Foundation & Infrastructure (CURRENT)
-Next.js project, Tailwind theme, Supabase client setup, folder structure, middleware, CLAUDE.md, deployment pipeline, health check endpoint.
-
-### Phase 2 — Public Marketing Site
-### Phase 3 — Forms & Lead Capture
-### Phase 4 — Buildium Integration
-### Phase 5 — Operational Tooling
-### Phase 6 — AI Workflow Integration
-
----
-
 ## Gotchas
 
 - **No Prisma** — We use Supabase JS client directly, not Prisma ORM
+- **No tenant portal** — Tenants use Buildium (managebuilding.com) for applications, login, and payments
+- **No maintenance forms** — Not in scope for this site
 - **Tailwind CSS v4** — Uses CSS-based config (`@theme inline` in globals.css), not tailwind.config.js
-- **Buildium requires Premium plan** ($375+/month)
 - **Mobile matters** — every UI change must account for sm/md/lg breakpoints
 - **CSP is strict** — adding third-party resources requires updating next.config.ts headers
 - **Serverless timeout**: 30s max for API routes
+- **Resend not configured yet** — contact form saves to Supabase but does not send email yet
+- **Turnstile not configured yet** — form protection is deferred

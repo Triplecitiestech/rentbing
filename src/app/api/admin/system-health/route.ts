@@ -61,11 +61,18 @@ export async function GET() {
   else if (statuses.includes("degraded") || statuses.includes("unconfigured"))
     overall = "degraded";
 
+  const envCheck: Record<string, boolean> = {
+    NEXT_PUBLIC_SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    ADMIN_API_KEY: !!process.env.ADMIN_API_KEY,
+  };
+
   const result: HealthCheckResult = {
     status: overall,
     services,
     timestamp: new Date().toISOString(),
   };
 
-  return NextResponse.json(result);
+  return NextResponse.json({ ...result, envCheck });
 }

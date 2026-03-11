@@ -34,17 +34,21 @@ interface PropertyWithImages {
 
 export default async function PropertiesPage() {
   let listings: PropertyWithImages[] = [];
+  let dbError: string | null = null;
 
   try {
     const supabase = await createClient();
-    const { data: properties } = await supabase
+    const { data: properties, error } = await supabase
       .from("properties")
       .select("*, property_images(image_url, sort_order)")
       .order("created_at", { ascending: false });
 
+    if (error) {
+      dbError = error.message;
+    }
     listings = properties || [];
-  } catch {
-    // Supabase not configured or unreachable — show empty state
+  } catch (err) {
+    dbError = err instanceof Error ? err.message : "Failed to connect to database";
   }
 
   return (
@@ -55,6 +59,11 @@ export default async function PropertiesPage() {
       />
 
       <Section background="gradient">
+        {dbError && (
+          <div className="mb-6 rounded-lg border border-red-500/30 bg-red-600/10 px-4 py-3 text-sm text-red-400">
+            <strong>Database error:</strong> {dbError}
+          </div>
+        )}
         {listings.length === 0 ? (
           <div className="text-center">
             <p className="text-lg text-secondary-400">

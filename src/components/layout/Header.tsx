@@ -18,17 +18,17 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-primary-700 shadow-lg">
       <Container>
-        <div className="flex h-16 items-center justify-between">
+        <div className="relative flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="relative z-10 flex items-center gap-2">
             <span className="text-xl font-bold tracking-tight sm:text-2xl">
               <span className="text-white">Rent</span>
               <span className="text-primary-300">Bing</span>
             </span>
           </Link>
 
-          {/* Desktop nav — centered */}
-          <nav className="hidden flex-1 items-center justify-center gap-1 md:flex">
+          {/* Desktop nav — absolutely centered */}
+          <nav className="absolute inset-0 hidden items-center justify-center gap-1 md:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.label}
@@ -41,7 +41,7 @@ export function Header() {
           </nav>
 
           {/* Desktop actions */}
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="relative z-10 hidden items-center gap-3 md:flex">
             <a
               href={`tel:${siteConfig.phone}`}
               className="text-sm font-medium text-white/90 transition-colors hover:text-white"

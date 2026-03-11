@@ -7,11 +7,11 @@ import { ContactForm } from "@/components/forms/ContactForm";
 
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-primary-950 via-[#0a1628] to-secondary-950 py-24 sm:py-32 lg:py-40">
+    <section className="relative overflow-hidden bg-gradient-to-br from-primary-800 via-primary-700 to-primary-900 py-24 sm:py-32 lg:py-40">
       {/* Background visual effects */}
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-primary-600)_0%,_transparent_50%)] opacity-15" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--color-accent-gold)_0%,_transparent_50%)] opacity-10" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--color-primary-500)_0%,_transparent_50%)] opacity-20" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--color-accent-lime)_0%,_transparent_50%)] opacity-8" />
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -24,28 +24,28 @@ function HeroSection() {
 
       <Container className="relative z-10">
         <div className="mx-auto max-w-4xl text-center">
-          {/* Gold badge */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent-gold/30 bg-accent-gold/10 px-5 py-2 text-sm font-semibold text-accent-gold-light">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-accent-gold" />
+          {/* Badge */}
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm font-semibold text-white">
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-accent-lime" />
             Now Leasing for 2026–2027
           </div>
 
-          <h1 className="text-5xl font-extrabold leading-tight tracking-tight sm:text-6xl md:text-7xl">
+          <h1 className="text-5xl font-extrabold leading-tight tracking-tight text-white sm:text-6xl md:text-7xl">
             Off-Campus Living
             <br />
-            <span className="bg-gradient-to-r from-primary-400 via-accent-cyan to-primary-300 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary-300 via-primary-200 to-primary-300 bg-clip-text text-transparent">
               Done Right
             </span>
           </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-secondary-300 sm:text-xl">
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-white/80 sm:text-xl">
             Premier student housing near Binghamton University. 20+ years of
             providing quality apartments in Downtown Binghamton.
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link href="/properties">
-              <Button size="lg" className="bg-gradient-to-r from-primary-500 to-primary-600 px-8 text-lg shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40">
+              <Button size="lg" className="bg-white px-8 text-lg font-semibold text-primary-700 shadow-lg hover:bg-primary-100">
                 View Properties
               </Button>
             </Link>
@@ -54,34 +54,30 @@ function HeroSection() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <Button variant="outline" size="lg" className="border-accent-gold/50 px-8 text-lg text-accent-gold-light hover:bg-accent-gold/10">
+              <Button variant="outline" size="lg" className="border-white/40 px-8 text-lg text-white hover:bg-white/10">
                 Apply Now
               </Button>
             </a>
             <a href={`tel:${siteConfig.phone}`}>
-              <Button variant="ghost" size="lg" className="text-lg text-secondary-300 hover:text-white">
+              <Button variant="ghost" size="lg" className="text-lg text-white/80 hover:text-white">
                 Call {siteConfig.phone}
               </Button>
             </a>
           </div>
 
           {/* Trust indicators */}
-          <div className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-secondary-400">
+          <div className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-sm text-white/70">
             <span className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-accent-emerald" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
+              <svg className="h-5 w-5 text-primary-300" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
               Pet Friendly Options
             </span>
             <span className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-accent-emerald" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
+              <svg className="h-5 w-5 text-primary-300" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
               Minutes to Campus
             </span>
             <span className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-accent-emerald" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
+              <svg className="h-5 w-5 text-primary-300" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
               On-Site Laundry
-            </span>
-            <span className="flex items-center gap-2">
-              <svg className="h-5 w-5 text-accent-emerald" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.06l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" /></svg>
-              24/7 Maintenance
             </span>
           </div>
         </div>
@@ -104,7 +100,7 @@ function StatsBar() {
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
           {stats.map((stat) => (
             <div key={stat.label} className="text-center">
-              <div className="text-3xl font-extrabold text-accent-gold sm:text-4xl">
+              <div className="text-3xl font-extrabold text-primary-400 sm:text-4xl">
                 {stat.value}
               </div>
               <div className="mt-1 text-sm font-medium text-secondary-400">
@@ -126,23 +122,23 @@ function FeaturedListings() {
       address: "132 & 139 Washington St",
       features: ["Downtown Location", "Near Campus", "Laundry On-Site"],
       gradient: "from-primary-600/80 via-primary-700/60 to-primary-900/80",
-      accent: "bg-primary-400",
+      accent: "bg-primary-500",
     },
     {
       title: "Studios & One Bedrooms",
       price: "From $975/month",
       address: "139 & 257 Washington St",
       features: ["Perfect for Grad Students", "Private Living", "All Utilities Options"],
-      gradient: "from-accent-gold/60 via-amber-700/40 to-secondary-900/80",
-      accent: "bg-accent-gold",
+      gradient: "from-primary-500/60 via-emerald-700/40 to-secondary-900/80",
+      accent: "bg-primary-400",
     },
     {
       title: "Large Multi-Bedrooms",
       price: "From $600/person",
       address: "135 Washington & Court St",
       features: ["Great for Groups", "4-7+ Bedrooms", "Utilities Included Options"],
-      gradient: "from-accent-cyan/50 via-teal-800/40 to-secondary-900/80",
-      accent: "bg-accent-cyan",
+      gradient: "from-emerald-600/50 via-teal-800/40 to-secondary-900/80",
+      accent: "bg-accent-emerald",
     },
   ];
 
@@ -152,7 +148,7 @@ function FeaturedListings() {
         <div className="text-center">
           <h2 className="text-3xl font-bold sm:text-4xl lg:text-5xl">
             Find Your{" "}
-            <span className="bg-gradient-to-r from-accent-gold to-accent-gold-light bg-clip-text text-transparent">
+            <span className="text-primary-400">
               Perfect Place
             </span>
           </h2>
@@ -166,7 +162,7 @@ function FeaturedListings() {
           {listings.map((listing) => (
             <div
               key={listing.title}
-              className="group relative overflow-hidden rounded-2xl border border-secondary-700/50 bg-secondary-900 transition-all duration-300 hover:-translate-y-1 hover:border-secondary-600 hover:shadow-2xl hover:shadow-primary-500/10"
+              className="group relative overflow-hidden rounded-2xl border border-secondary-700/50 bg-secondary-900 transition-all duration-300 hover:-translate-y-1 hover:border-primary-600/50 hover:shadow-2xl hover:shadow-primary-500/10"
             >
               {/* Gradient image area */}
               <div
@@ -196,7 +192,7 @@ function FeaturedListings() {
                       key={feature}
                       className="flex items-center gap-2 text-sm text-secondary-300"
                     >
-                      <svg className="h-4 w-4 shrink-0 text-accent-emerald" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" /></svg>
+                      <svg className="h-4 w-4 shrink-0 text-primary-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" /></svg>
                       {feature}
                     </li>
                   ))}
@@ -234,7 +230,7 @@ function WhyRentBing() {
       ),
       title: "Responsive Maintenance",
       description:
-        "Submit maintenance requests online and get fast, reliable service — 24/7 emergency support available.",
+        "Submit maintenance requests online and get fast, reliable service from our dedicated team.",
     },
     {
       icon: (
@@ -267,7 +263,7 @@ function WhyRentBing() {
         <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {reasons.map((reason) => (
             <div key={reason.title} className="text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-500/10 text-primary-400">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-700/20 text-primary-400">
                 {reason.icon}
               </div>
               <h3 className="mt-4 text-lg font-bold">{reason.title}</h3>
@@ -291,7 +287,7 @@ function ContactSection() {
           <div>
             <h2 className="text-3xl font-bold sm:text-4xl">
               Ready to Find Your{" "}
-              <span className="text-accent-gold">New Home?</span>
+              <span className="text-primary-400">New Home?</span>
             </h2>
             <p className="mt-4 text-lg text-secondary-400">
               Fill out the form and we&apos;ll get back to you within 24 hours.
@@ -302,9 +298,9 @@ function ContactSection() {
               {/* Phone card */}
               <a
                 href={`tel:${siteConfig.phone}`}
-                className="flex items-center gap-4 rounded-xl border border-secondary-700/50 bg-secondary-900/50 p-4 transition-colors hover:border-primary-500/50 hover:bg-secondary-800/50"
+                className="flex items-center gap-4 rounded-xl border border-secondary-700/50 bg-secondary-900/50 p-4 transition-colors hover:border-primary-600/50 hover:bg-secondary-800/50"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-500/10 text-primary-400">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-700/20 text-primary-400">
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg>
                 </div>
                 <div>
@@ -318,9 +314,9 @@ function ContactSection() {
               {/* Email card */}
               <a
                 href={`mailto:${siteConfig.contactEmail}`}
-                className="flex items-center gap-4 rounded-xl border border-secondary-700/50 bg-secondary-900/50 p-4 transition-colors hover:border-primary-500/50 hover:bg-secondary-800/50"
+                className="flex items-center gap-4 rounded-xl border border-secondary-700/50 bg-secondary-900/50 p-4 transition-colors hover:border-primary-600/50 hover:bg-secondary-800/50"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-accent-gold/10 text-accent-gold">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-700/20 text-primary-400">
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
                 </div>
                 <div>
@@ -336,16 +332,16 @@ function ContactSection() {
                 href={siteConfig.externalLinks.application}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 rounded-xl border border-accent-gold/30 bg-accent-gold/5 p-4 transition-colors hover:border-accent-gold/50 hover:bg-accent-gold/10"
+                className="flex items-center gap-4 rounded-xl border border-primary-600/30 bg-primary-700/10 p-4 transition-colors hover:border-primary-600/50 hover:bg-primary-700/20"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-accent-gold/10 text-accent-gold">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-700/20 text-primary-400">
                   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
                 </div>
                 <div>
                   <div className="text-sm text-secondary-400">
                     Ready to apply?
                   </div>
-                  <div className="font-semibold text-accent-gold-light">
+                  <div className="font-semibold text-primary-400">
                     Submit a Rental Application
                   </div>
                 </div>

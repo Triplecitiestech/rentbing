@@ -28,14 +28,19 @@ interface PropertyWithImages {
 }
 
 export default async function PropertiesPage() {
-  const supabase = await createClient();
+  let listings: PropertyWithImages[] = [];
 
-  const { data: properties } = await supabase
-    .from("properties")
-    .select("*, property_images(image_url, sort_order)")
-    .order("created_at", { ascending: false });
+  try {
+    const supabase = await createClient();
+    const { data: properties } = await supabase
+      .from("properties")
+      .select("*, property_images(image_url, sort_order)")
+      .order("created_at", { ascending: false });
 
-  const listings: PropertyWithImages[] = properties || [];
+    listings = properties || [];
+  } catch {
+    // Supabase not configured or unreachable — show empty state
+  }
 
   return (
     <>

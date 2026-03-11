@@ -1,9 +1,23 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Card } from "@/components/ui/Card";
 import { siteConfig } from "@/config/site";
 import { ContactForm } from "@/components/forms/ContactForm";
+
+export const metadata: Metadata = {
+  title: "RentBing — Off-Campus Student Housing Near Binghamton University",
+  description:
+    "Premier off-campus apartments for Binghamton University students. Two bedrooms, studios, and multi-bedroom units in Downtown Binghamton. Now leasing for 2026-2027.",
+  openGraph: {
+    title: "RentBing — Off-Campus Student Housing Near Binghamton University",
+    description:
+      "Premier off-campus apartments for Binghamton University students. Now leasing for 2026-2027.",
+    url: siteConfig.url,
+    type: "website",
+  },
+};
 
 function HeroSection() {
   return (

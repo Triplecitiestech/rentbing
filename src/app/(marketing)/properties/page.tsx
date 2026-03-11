@@ -10,7 +10,12 @@ import { createClient } from "@/lib/supabase/server";
 export const metadata: Metadata = {
   title: "Properties For Rent",
   description:
-    "Browse available apartments for rent near Binghamton University. Two bedrooms, three bedrooms, and studios available.",
+    "Browse available apartments for rent near Binghamton University. Two bedrooms, studios, and multi-bedroom units in Downtown Binghamton.",
+  openGraph: {
+    title: "Properties For Rent | RentBing",
+    description:
+      "Browse available apartments for rent near Binghamton University. Now leasing for 2026-2027.",
+  },
 };
 
 export const dynamic = "force-dynamic";

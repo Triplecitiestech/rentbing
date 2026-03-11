@@ -9,15 +9,15 @@ export function Footer() {
         <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
           {/* Logo */}
           <Link href="/" className="text-xl font-bold tracking-tight">
-            <span className="text-primary-400">Rent</span>
-            <span className="text-white">Bing</span>
+            <span className="text-white">Rent</span>
+            <span className="text-primary-400">Bing</span>
           </Link>
 
           {/* Actions */}
           <div className="flex items-center gap-4">
             <a
               href={`tel:${siteConfig.phone}`}
-              className="rounded border border-secondary-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:border-primary-600 hover:bg-primary-600"
+              className="rounded border border-secondary-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:border-primary-600 hover:bg-primary-700"
             >
               {siteConfig.phone}
             </a>

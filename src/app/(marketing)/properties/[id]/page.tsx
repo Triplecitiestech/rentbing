@@ -31,34 +31,46 @@ interface PageProps {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: property } = await supabase
-    .from("properties")
-    .select("title, address, bedrooms, bathrooms, price")
-    .eq("id", id)
-    .single();
 
-  if (!property) return { title: "Property Not Found" };
+  try {
+    const supabase = await createClient();
+    const { data: property } = await supabase
+      .from("properties")
+      .select("title, address, bedrooms, bathrooms, price")
+      .eq("id", id)
+      .single();
 
-  return {
-    title: `${property.title} — ${property.bedrooms}BR — ${property.price}`,
-    description: `${property.title} at ${property.address}. ${property.bedrooms} bedroom, ${property.bathrooms} bath apartment for rent near Binghamton University.`,
-  };
+    if (!property) return { title: "Property Not Found" };
+
+    return {
+      title: `${property.title} — ${property.bedrooms}BR — ${property.price}`,
+      description: `${property.title} at ${property.address}. ${property.bedrooms} bedroom, ${property.bathrooms} bath apartment for rent near Binghamton University.`,
+    };
+  } catch {
+    return { title: "Property Not Found" };
+  }
 }
 
 export default async function PropertyDetailPage({ params }: PageProps) {
   const { id } = await params;
-  const supabase = await createClient();
 
-  const { data: property } = await supabase
-    .from("properties")
-    .select("*, property_images(id, image_url, sort_order)")
-    .eq("id", id)
-    .single();
+  let prop: PropertyDetail | null = null;
 
-  if (!property) notFound();
+  try {
+    const supabase = await createClient();
+    const { data: property } = await supabase
+      .from("properties")
+      .select("*, property_images(id, image_url, sort_order)")
+      .eq("id", id)
+      .single();
 
-  const prop = property as PropertyDetail;
+    prop = property as PropertyDetail | null;
+  } catch {
+    notFound();
+  }
+
+  if (!prop) notFound();
+
   const images = prop.property_images?.sort((a, b) => a.sort_order - b.sort_order) || [];
 
   return (

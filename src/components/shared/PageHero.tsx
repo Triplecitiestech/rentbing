@@ -19,13 +19,13 @@ export function PageHero({
   return (
     <section
       className={cn(
-        "relative overflow-hidden bg-gradient-to-b from-primary-950 via-secondary-900 to-secondary-950 py-20 sm:py-28 lg:py-32",
+        "relative overflow-hidden bg-gradient-to-b from-primary-800 via-primary-900 to-secondary-950 py-20 sm:py-28 lg:py-32",
         className
       )}
     >
       <div className="absolute inset-0">
         <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-primary-600/10 blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-accent-cyan/5 blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-primary-500/5 blur-3xl" />
       </div>
       <Container className="relative z-10 text-center">
         {badge && (

@@ -6,56 +6,70 @@ import { cn } from "@/utils/cn";
 import { Container } from "@/components/ui/Container";
 import { siteConfig } from "@/config/site";
 
-const navActions = [
-  {
-    label: "Application",
-    href: siteConfig.externalLinks.application,
-    external: true,
-  },
-  { label: "Contact", href: "/contact", external: false },
-  {
-    label: "Tenant",
-    href: siteConfig.externalLinks.tenantLogin,
-    external: true,
-  },
+const navLinks = [
+  { label: "Properties", href: "/properties" },
+  { label: "Contact", href: "/contact" },
+  { label: "Maintenance", href: "/maintenance" },
 ];
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-secondary-800 bg-secondary-950/90 backdrop-blur-lg">
+    <header className="sticky top-0 z-50 bg-primary-700 shadow-lg">
       <Container>
-        <div className="flex h-16 items-center justify-between sm:h-20">
+        <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <span className="text-xl font-bold tracking-tight sm:text-2xl">
-              <span className="text-primary-400">Rent</span>
-              <span className="text-white">Bing</span>
+              <span className="text-white">Rent</span>
+              <span className="text-primary-300">Bing</span>
             </span>
           </Link>
 
-          {/* Center banner — desktop */}
-          <div className="hidden items-center gap-4 md:flex">
-            <div className="rounded border border-primary-700 bg-primary-950/50 px-6 py-2 text-center">
-              <span className="text-sm font-semibold tracking-wide text-white">
-                Apartments For Rent 2026-2027
-              </span>
-            </div>
-            <div className="rounded border border-primary-700 bg-primary-950/50 px-6 py-2">
-              <a
-                href={`tel:${siteConfig.phone}`}
-                className="text-sm font-semibold text-white"
+          {/* Desktop nav */}
+          <nav className="hidden items-center gap-1 md:flex">
+            {navLinks.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white"
               >
-                {siteConfig.phone}
-              </a>
-            </div>
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Desktop actions */}
+          <div className="hidden items-center gap-3 md:flex">
+            <a
+              href={`tel:${siteConfig.phone}`}
+              className="text-sm font-medium text-white/90 transition-colors hover:text-white"
+            >
+              {siteConfig.phone}
+            </a>
+            <a
+              href={siteConfig.externalLinks.application}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-primary-700 transition-colors hover:bg-primary-100"
+            >
+              Apply Now
+            </a>
+            <a
+              href={siteConfig.externalLinks.tenantLogin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-white/30 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
+            >
+              Tenant Login
+            </a>
           </div>
 
           {/* Mobile hamburger */}
           <button
             type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-secondary-300 hover:text-white md:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-lg text-white/80 hover:text-white md:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
           >
@@ -69,75 +83,50 @@ export function Header() {
           </button>
         </div>
 
-        {/* Action buttons row — desktop */}
-        <div className="hidden items-center justify-center gap-3 pb-3 md:flex">
-          {navActions.map((action) =>
-            action.external ? (
-              <a
-                key={action.label}
-                href={action.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded border border-primary-600 px-6 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary-600"
-              >
-                {action.label}
-              </a>
-            ) : (
-              <Link
-                key={action.label}
-                href={action.href}
-                className="rounded border border-primary-600 px-6 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary-600"
-              >
-                {action.label}
-              </Link>
-            )
-          )}
-        </div>
-
         {/* Mobile menu */}
         <div
           className={cn(
             "overflow-hidden transition-all duration-300 md:hidden",
-            mobileOpen ? "max-h-80 pb-4" : "max-h-0"
+            mobileOpen ? "max-h-96 pb-4" : "max-h-0"
           )}
         >
-          <div className="mb-3 flex flex-col gap-2 text-center text-sm">
-            <span className="text-secondary-300">Apartments For Rent 2026-2027</span>
-            <a href={`tel:${siteConfig.phone}`} className="font-semibold text-white">
-              {siteConfig.phone}
-            </a>
-          </div>
-          <nav className="flex flex-col gap-2">
-            <Link
-              href="/properties"
-              className="rounded-lg px-3 py-2 text-center text-sm font-medium text-secondary-300 hover:text-white hover:bg-white/5"
+          <nav className="flex flex-col gap-1 border-t border-white/10 pt-3">
+            {navLinks.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="rounded-lg px-3 py-2.5 text-sm font-medium text-white/90 hover:bg-white/10 hover:text-white"
+                onClick={() => setMobileOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <div className="my-2 border-t border-white/10" />
+            <a
+              href={`tel:${siteConfig.phone}`}
+              className="rounded-lg px-3 py-2.5 text-center text-sm font-semibold text-white"
               onClick={() => setMobileOpen(false)}
             >
-              Properties
-            </Link>
-            {navActions.map((action) =>
-              action.external ? (
-                <a
-                  key={action.label}
-                  href={action.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rounded border border-primary-600 px-3 py-2 text-center text-sm font-medium text-white hover:bg-primary-600"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {action.label}
-                </a>
-              ) : (
-                <Link
-                  key={action.label}
-                  href={action.href}
-                  className="rounded border border-primary-600 px-3 py-2 text-center text-sm font-medium text-white hover:bg-primary-600"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {action.label}
-                </Link>
-              )
-            )}
+              Call {siteConfig.phone}
+            </a>
+            <a
+              href={siteConfig.externalLinks.application}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg bg-white px-3 py-2.5 text-center text-sm font-semibold text-primary-700"
+              onClick={() => setMobileOpen(false)}
+            >
+              Apply Now
+            </a>
+            <a
+              href={siteConfig.externalLinks.tenantLogin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-lg border border-white/30 px-3 py-2.5 text-center text-sm font-medium text-white"
+              onClick={() => setMobileOpen(false)}
+            >
+              Tenant Login
+            </a>
           </nav>
         </div>
       </Container>

@@ -4,51 +4,68 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-async function getStats() {
-  const supabase = createAdminClient();
+interface Stats {
+  totalProperties: number;
+  availableProperties: number;
+  totalInquiries: number;
+  totalMaintenance: number;
+  openMaintenance: number;
+  emergencyMaintenance: number;
+  recentInquiries: { id: string; created_at: string }[];
+  recentMaintenance: { id: string; status: string; priority: string; created_at: string }[];
+  error?: string;
+}
 
-  const [properties, inquiries, maintenance] = await Promise.all([
-    supabase.from("properties").select("id, status"),
-    supabase
-      .from("inquiries")
-      .select("id, created_at")
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("maintenance_requests")
-      .select("id, status, priority, created_at")
-      .order("created_at", { ascending: false }),
-  ]);
-
-  const totalProperties = properties.data?.length ?? 0;
-  const availableProperties =
-    properties.data?.filter((p) => p.status === "available").length ?? 0;
-  const totalInquiries = inquiries.data?.length ?? 0;
-  const totalMaintenance = maintenance.data?.length ?? 0;
-  const openMaintenance =
-    maintenance.data?.filter((m) =>
-      ["new", "triaged", "in_progress", "waiting_parts", "scheduled"].includes(
-        m.status
-      )
-    ).length ?? 0;
-  const emergencyMaintenance =
-    maintenance.data?.filter(
-      (m) => m.priority === "emergency" && m.status !== "completed" && m.status !== "cancelled"
-    ).length ?? 0;
-
-  // Recent items (last 5)
-  const recentInquiries = (inquiries.data ?? []).slice(0, 5);
-  const recentMaintenance = (maintenance.data ?? []).slice(0, 5);
-
-  return {
-    totalProperties,
-    availableProperties,
-    totalInquiries,
-    totalMaintenance,
-    openMaintenance,
-    emergencyMaintenance,
-    recentInquiries,
-    recentMaintenance,
+async function getStats(): Promise<Stats> {
+  const empty: Stats = {
+    totalProperties: 0,
+    availableProperties: 0,
+    totalInquiries: 0,
+    totalMaintenance: 0,
+    openMaintenance: 0,
+    emergencyMaintenance: 0,
+    recentInquiries: [],
+    recentMaintenance: [],
   };
+
+  try {
+    const supabase = createAdminClient();
+
+    const [properties, inquiries, maintenance] = await Promise.all([
+      supabase.from("properties").select("id, status"),
+      supabase
+        .from("inquiries")
+        .select("id, created_at")
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("maintenance_requests")
+        .select("id, status, priority, created_at")
+        .order("created_at", { ascending: false }),
+    ]);
+
+    return {
+      totalProperties: properties.data?.length ?? 0,
+      availableProperties:
+        properties.data?.filter((p) => p.status === "available").length ?? 0,
+      totalInquiries: inquiries.data?.length ?? 0,
+      totalMaintenance: maintenance.data?.length ?? 0,
+      openMaintenance:
+        maintenance.data?.filter((m) =>
+          ["new", "triaged", "in_progress", "waiting_parts", "scheduled"].includes(m.status)
+        ).length ?? 0,
+      emergencyMaintenance:
+        maintenance.data?.filter(
+          (m) => m.priority === "emergency" && m.status !== "completed" && m.status !== "cancelled"
+        ).length ?? 0,
+      recentInquiries: (inquiries.data ?? []).slice(0, 5),
+      recentMaintenance: (maintenance.data ?? []).slice(0, 5),
+    };
+  } catch (err) {
+    return {
+      ...empty,
+      error: err instanceof Error ? err.message : "Failed to connect to database",
+    };
+  }
 }
 
 export default async function AdminDashboard() {
@@ -88,6 +105,15 @@ export default async function AdminDashboard() {
   return (
     <div>
       <h1 className="mb-6 text-2xl font-bold">Dashboard</h1>
+
+      {stats.error && (
+        <div className="mb-6 rounded-lg border border-red-500/30 bg-red-600/10 px-4 py-3 text-sm text-red-400">
+          <strong>Database error:</strong> {stats.error}
+          <p className="mt-1 text-xs text-red-400/70">
+            Make sure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in your Vercel environment variables.
+          </p>
+        </div>
+      )}
 
       {/* Stat cards */}
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">

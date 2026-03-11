@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useAdmin } from "@/components/admin/AdminShell";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
@@ -18,11 +19,8 @@ interface PropertyImage {
   sort_order: number;
 }
 
-interface ImageManagerProps {
-  adminKey: string;
-}
-
-export default function ImageManager({ adminKey }: ImageManagerProps) {
+export default function ImageManager() {
+  const { authHeaders } = useAdmin();
   const [properties, setProperties] = useState<Property[]>([]);
   const [selectedPropertyId, setSelectedPropertyId] = useState("");
   const [images, setImages] = useState<PropertyImage[]>([]);
@@ -31,11 +29,6 @@ export default function ImageManager({ adminKey }: ImageManagerProps) {
   const [uploadResult, setUploadResult] = useState<string | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const authHeaders = useCallback(
-    () => ({ Authorization: `Bearer ${adminKey}` }),
-    [adminKey]
-  );
 
   // Fetch properties list on mount
   useEffect(() => {
@@ -154,9 +147,8 @@ export default function ImageManager({ adminKey }: ImageManagerProps) {
   const selectedProperty = properties.find((p) => p.id === selectedPropertyId);
 
   return (
-    <div className="min-h-screen bg-secondary-950 p-4 sm:p-8">
-      <div className="mx-auto max-w-5xl">
-        <h1 className="mb-6 text-2xl font-bold">Property Image Manager</h1>
+    <div>
+      <h1 className="mb-6 text-2xl font-bold">Images</h1>
 
         {/* Property selector */}
         <Card className="mb-6" padding="md">
@@ -296,7 +288,6 @@ export default function ImageManager({ adminKey }: ImageManagerProps) {
             )}
           </>
         )}
-      </div>
     </div>
   );
 }

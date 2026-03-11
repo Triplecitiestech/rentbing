@@ -4,6 +4,7 @@ import { siteConfig } from "@/config/site";
 import {
   LocalBusinessJsonLd,
   OrganizationJsonLd,
+  WebSiteJsonLd,
 } from "@/components/seo/JsonLd";
 
 export const metadata: Metadata = {
@@ -49,6 +50,7 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <LocalBusinessJsonLd />
         <OrganizationJsonLd />
+        <WebSiteJsonLd />
         {children}
       </body>
     </html>

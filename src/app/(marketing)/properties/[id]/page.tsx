@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { siteConfig } from "@/config/site";
 import { ImageGallery } from "@/components/properties/ImageGallery";
+import {
+  RentalPropertyJsonLd,
+  BreadcrumbJsonLd,
+} from "@/components/seo/JsonLd";
 
 interface PropertyDetail {
   id: string;
@@ -42,9 +46,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
     if (!property) return { title: "Property Not Found" };
 
+    const title = `${property.title} — ${property.bedrooms}BR — ${property.price}`;
+    const description = `${property.title} at ${property.address}. ${property.bedrooms} bedroom, ${property.bathrooms} bath apartment for rent near Binghamton University.`;
+
     return {
-      title: `${property.title} — ${property.bedrooms}BR — ${property.price}`,
-      description: `${property.title} at ${property.address}. ${property.bedrooms} bedroom, ${property.bathrooms} bath apartment for rent near Binghamton University.`,
+      title,
+      description,
+      openGraph: {
+        title: `${title} | RentBing`,
+        description,
+        url: `${siteConfig.url}/properties/${id}`,
+      },
     };
   } catch {
     return { title: "Property Not Found" };
@@ -73,8 +85,32 @@ export default async function PropertyDetailPage({ params }: PageProps) {
 
   const images = prop.property_images?.sort((a, b) => a.sort_order - b.sort_order) || [];
 
+  const propertyUrl = `${siteConfig.url}/properties/${prop.id}`;
+
   return (
     <div className="min-h-screen bg-secondary-950">
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", url: siteConfig.url },
+          { name: "Properties", url: `${siteConfig.url}/properties` },
+          { name: prop.title, url: propertyUrl },
+        ]}
+      />
+      <RentalPropertyJsonLd
+        name={prop.title}
+        description={prop.description || ""}
+        address={prop.address}
+        city={prop.city}
+        state={prop.state}
+        zip={prop.zip}
+        price={prop.price}
+        bedrooms={prop.bedrooms}
+        bathrooms={prop.bathrooms}
+        squareFeet={prop.square_feet}
+        url={propertyUrl}
+        images={images.map((img) => img.image_url)}
+        status={prop.status}
+      />
       {/* Hero image */}
       {images.length > 0 ? (
         <div className="relative h-[300px] sm:h-[400px] lg:h-[500px]">

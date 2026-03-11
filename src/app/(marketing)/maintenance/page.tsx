@@ -9,6 +9,11 @@ export const metadata: Metadata = {
   title: "Maintenance Request",
   description:
     "Submit a maintenance request for your RentBing rental property. We respond to all requests promptly.",
+  openGraph: {
+    title: "Maintenance Request | RentBing",
+    description:
+      "Submit a maintenance request for your RentBing rental property.",
+  },
 };
 
 export default function MaintenancePage() {

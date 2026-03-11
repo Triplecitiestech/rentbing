@@ -8,7 +8,12 @@ import { siteConfig } from "@/config/site";
 export const metadata: Metadata = {
   title: "Contact Us",
   description:
-    "Contact RentBing about available apartments near Binghamton University. Off-campus student housing inquiries.",
+    "Contact RentBing about available apartments near Binghamton University. Call 607-484-7654 or fill out our inquiry form.",
+  openGraph: {
+    title: "Contact Us | RentBing",
+    description:
+      "Get in touch about off-campus student housing near Binghamton University. Call 607-484-7654.",
+  },
 };
 
 export default function ContactPage() {

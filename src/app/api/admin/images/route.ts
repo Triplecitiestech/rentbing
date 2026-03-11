@@ -79,6 +79,13 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient();
 
+    // Ensure storage bucket exists (idempotent — no-ops if already created)
+    await supabase.storage.createBucket(BUCKET, {
+      public: true,
+      fileSizeLimit: MAX_FILE_SIZE,
+      allowedMimeTypes: ALLOWED_TYPES,
+    });
+
     // Verify property exists
     const { data: property, error: propError } = await supabase
       .from("properties")

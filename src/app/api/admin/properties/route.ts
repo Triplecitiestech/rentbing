@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
       square_feet,
       property_type,
       status,
+      featured,
     } = body;
 
     if (!title || !address || !price) {
@@ -85,6 +86,7 @@ export async function POST(request: NextRequest) {
         square_feet: square_feet || null,
         property_type: property_type || "Apartment",
         status: status || "available",
+        featured: featured ?? false,
       })
       .select()
       .single();
@@ -133,6 +135,7 @@ export async function PATCH(request: NextRequest) {
       "square_feet",
       "property_type",
       "status",
+      "featured",
     ];
     const safeUpdates: Record<string, unknown> = {};
     for (const key of allowed) {

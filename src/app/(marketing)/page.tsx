@@ -179,6 +179,93 @@ function FeaturedListings({ properties }: { properties: FeaturedProperty[] }) {
   );
 }
 
+function OurProcess() {
+  const steps = [
+    {
+      number: "1",
+      title: "Apply",
+      description:
+        "Fill out a quick rental application online through our portal. It only takes a few minutes.",
+      icon: (
+        <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+        </svg>
+      ),
+    },
+    {
+      number: "2",
+      title: "See the Place",
+      description:
+        "Schedule a tour to walk through the property in person. See exactly where you'll be living.",
+      icon: (
+        <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+        </svg>
+      ),
+    },
+    {
+      number: "3",
+      title: "Move In",
+      description:
+        "Sign your lease, grab your keys, and settle into your new home. It's that simple.",
+      icon: (
+        <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121.75 8.25z" />
+        </svg>
+      ),
+    },
+  ];
+
+  return (
+    <section className="bg-secondary-950 py-16 sm:py-20 lg:py-24">
+      <Container>
+        <div className="text-center">
+          <h2 className="text-3xl font-bold sm:text-4xl">
+            Our Process is as Easy as{" "}
+            <span className="text-primary-400">1-2-3</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-secondary-400">
+            Getting into your new place has never been simpler.
+          </p>
+        </div>
+
+        <div className="mt-12 grid grid-cols-1 gap-8 sm:grid-cols-3">
+          {steps.map((step) => (
+            <div key={step.number} className="relative text-center">
+              {/* Step number */}
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary-600 text-2xl font-extrabold text-white shadow-lg shadow-primary-500/30">
+                {step.number}
+              </div>
+              {/* Icon */}
+              <div className="mx-auto mt-4 flex h-12 w-12 items-center justify-center text-primary-400">
+                {step.icon}
+              </div>
+              <h3 className="mt-3 text-xl font-bold text-white">
+                {step.title}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-secondary-400">
+                {step.description}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-10 text-center">
+          <a
+            href={siteConfig.externalLinks.application}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button size="lg" className="px-10 text-lg">
+              Start Your Application
+            </Button>
+          </a>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
 function WhyRentBing() {
   const reasons = [
     {
@@ -349,6 +436,7 @@ export default async function HomePage() {
     <>
       <HeroSection />
       <StatsBar />
+      <OurProcess />
       {featuredProperties.length > 0 && (
         <FeaturedListings properties={featuredProperties} />
       )}

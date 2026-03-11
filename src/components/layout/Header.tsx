@@ -27,8 +27,8 @@ export function Header() {
             </span>
           </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden items-center gap-1 md:flex">
+          {/* Desktop nav — centered */}
+          <nav className="hidden flex-1 items-center justify-center gap-1 md:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.label}

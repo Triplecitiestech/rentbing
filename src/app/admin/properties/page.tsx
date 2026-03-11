@@ -1,10 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useAdmin } from "@/components/admin/AdminShell";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+
+interface PropertyImage {
+  id: string;
+  image_url: string;
+  alt_text: string | null;
+  sort_order: number;
+}
 
 interface Property {
   id: string;
@@ -37,6 +44,130 @@ export default function AdminPropertiesPage() {
     type: "success" | "error";
     text: string;
   } | null>(null);
+
+  // Image management state
+  const [images, setImages] = useState<PropertyImage[]>([]);
+  const [loadingImages, setLoadingImages] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadResult, setUploadResult] = useState<string | null>(null);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const fetchImages = useCallback(
+    async (propertyId: string) => {
+      setLoadingImages(true);
+      try {
+        const res = await fetch(
+          `/api/admin/images?property_id=${propertyId}`,
+          { headers: authHeaders() }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setImages(data.images || []);
+        }
+      } catch {
+        setImages([]);
+      } finally {
+        setLoadingImages(false);
+      }
+    },
+    [authHeaders]
+  );
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0 || !editing?.id) return;
+
+    setUploading(true);
+    setUploadResult(null);
+
+    const formData = new FormData();
+    formData.append("property_id", editing.id);
+    Array.from(files).forEach((file) => formData.append("images", file));
+
+    try {
+      const res = await fetch("/api/admin/images", {
+        method: "POST",
+        headers: authHeaders(),
+        body: formData,
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setUploadResult(
+          `${data.message}${data.errors ? ` | Errors: ${data.errors.join(", ")}` : ""}`
+        );
+        fetchImages(editing.id);
+        fetchProperties();
+      } else {
+        setUploadResult(`Error: ${data.error}`);
+      }
+    } catch {
+      setUploadResult("Upload failed — network error");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleImageDelete = async (imageId: string) => {
+    if (!confirm("Delete this image?")) return;
+    try {
+      const res = await fetch(`/api/admin/images?id=${imageId}`, {
+        method: "DELETE",
+        headers: authHeaders(),
+      });
+      if (res.ok && editing?.id) {
+        setImages((prev) => prev.filter((img) => img.id !== imageId));
+        fetchProperties();
+      }
+    } catch {
+      alert("Delete failed");
+    }
+  };
+
+  const setAsHero = async (index: number) => {
+    if (index === 0) return;
+    const newImages = [...images];
+    const [moved] = newImages.splice(index, 1);
+    newImages.unshift(moved);
+    setImages(newImages);
+    await saveImageOrder(newImages);
+  };
+
+  const saveImageOrder = async (orderedImages: PropertyImage[]) => {
+    const order = orderedImages.map((img, i) => ({
+      id: img.id,
+      sort_order: i,
+    }));
+    try {
+      await fetch("/api/admin/images", {
+        method: "PATCH",
+        headers: { ...authHeaders(), "Content-Type": "application/json" },
+        body: JSON.stringify({ order }),
+      });
+    } catch {
+      alert("Failed to save order");
+      if (editing?.id) fetchImages(editing.id);
+    }
+  };
+
+  const handleDragStart = (index: number) => setDraggedIndex(index);
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+    const newImages = [...images];
+    const [moved] = newImages.splice(draggedIndex, 1);
+    newImages.splice(index, 0, moved);
+    setImages(newImages);
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnd = async () => {
+    setDraggedIndex(null);
+    await saveImageOrder(images);
+  };
 
   const fetchProperties = useCallback(async () => {
     try {
@@ -75,10 +206,18 @@ export default function AdminPropertiesPage() {
       if (res.ok) {
         setMessage({
           type: "success",
-          text: isNew ? "Property created" : "Property updated",
+          text: isNew
+            ? "Property created — you can now add images below"
+            : "Property updated",
         });
-        setEditing(null);
         fetchProperties();
+        if (isNew && data.property?.id) {
+          // Stay in edit mode so user can add images
+          setEditing({ ...editing, ...data.property });
+          setImages([]);
+        } else {
+          setEditing(null);
+        }
       } else {
         setMessage({ type: "error", text: data.error });
       }
@@ -131,6 +270,8 @@ export default function AdminPropertiesPage() {
 
   const startEdit = (p: Property) => {
     setEditing({ ...p });
+    setUploadResult(null);
+    fetchImages(p.id);
   };
 
   if (loading) {
@@ -372,11 +513,141 @@ export default function AdminPropertiesPage() {
               />
             </div>
           </div>
+
+          {/* Image management — only available after property is saved */}
+          {editing.id && (
+            <div className="mt-6 border-t border-secondary-700/50 pt-6">
+              <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-base font-semibold">Property Images</h3>
+                  <p className="text-xs text-secondary-500">
+                    The first image is the <strong className="text-primary-400">hero/cover photo</strong> shown on listings and the home page.
+                    Drag to reorder or click &quot;Set as Hero&quot; on any image.
+                  </p>
+                  <p className="mt-1 text-xs text-secondary-600">
+                    Recommended: <strong className="text-secondary-400">1600x1200px or larger</strong> (4:3 ratio). Images are auto-optimized to max 2000x2000px JPEG.
+                    For best results, upload photos at least 1200px wide to avoid blur.
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Badge variant="primary">{images.length} images</Badge>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
+                    multiple
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="property-file-upload"
+                  />
+                  <Button
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    isLoading={uploading}
+                    disabled={uploading}
+                  >
+                    {uploading ? "Uploading..." : "Upload Images"}
+                  </Button>
+                </div>
+              </div>
+
+              {uploadResult && (
+                <p
+                  className={`mb-3 text-sm ${uploadResult.startsWith("Error") ? "text-red-400" : "text-emerald-400"}`}
+                >
+                  {uploadResult}
+                </p>
+              )}
+
+              {loadingImages ? (
+                <p className="text-sm text-secondary-400">Loading images...</p>
+              ) : images.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-secondary-600 p-8 text-center">
+                  <svg className="mx-auto h-12 w-12 text-secondary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+                  </svg>
+                  <p className="mt-2 text-sm text-secondary-400">
+                    No images yet. Click &quot;Upload Images&quot; to add photos.
+                  </p>
+                  <p className="mt-1 text-xs text-secondary-600">
+                    Supports JPEG, PNG, WebP, HEIC/HEIF. Max 20MB per file.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                  {images.map((img, index) => (
+                    <div
+                      key={img.id}
+                      draggable
+                      onDragStart={() => handleDragStart(index)}
+                      onDragOver={(e) => handleDragOver(e, index)}
+                      onDragEnd={handleDragEnd}
+                      className={`group relative cursor-grab overflow-hidden rounded-lg border transition-all ${
+                        draggedIndex === index
+                          ? "border-primary-500 opacity-50"
+                          : index === 0
+                            ? "border-primary-500/50 ring-1 ring-primary-500/30"
+                            : "border-secondary-700/50 hover:border-secondary-500"
+                      }`}
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={img.image_url}
+                        alt={img.alt_text || "Property photo"}
+                        className="aspect-square w-full object-cover"
+                      />
+                      {/* Always-visible hero label */}
+                      {index === 0 && (
+                        <div className="absolute left-2 top-2">
+                          <Badge variant="success">Hero / Cover</Badge>
+                        </div>
+                      )}
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 flex flex-col justify-between bg-black/0 transition-colors group-hover:bg-black/50">
+                        <div className="flex justify-between p-2 opacity-0 transition-opacity group-hover:opacity-100">
+                          <Badge variant={index === 0 ? "success" : "default"}>
+                            {index === 0 ? "Hero" : `#${index + 1}`}
+                          </Badge>
+                          <button
+                            onClick={() => handleImageDelete(img.id)}
+                            className="rounded-full bg-red-600 p-1 text-white transition-colors hover:bg-red-700"
+                            title="Delete image"
+                          >
+                            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div className="flex items-center justify-between p-2 opacity-0 transition-opacity group-hover:opacity-100">
+                          <span className="text-xs text-white/70">Drag to reorder</span>
+                          {index !== 0 && (
+                            <button
+                              onClick={() => setAsHero(index)}
+                              className="rounded bg-primary-600 px-2 py-1 text-xs font-medium text-white transition-colors hover:bg-primary-700"
+                            >
+                              Set as Hero
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {!editing.id && (
+            <p className="mt-4 text-xs text-secondary-500">
+              Save the property first, then you can add images.
+            </p>
+          )}
+
           <div className="mt-4 flex gap-3">
             <Button onClick={handleSave} isLoading={saving}>
               {editing.id ? "Save Changes" : "Create Property"}
             </Button>
-            <Button variant="ghost" onClick={() => setEditing(null)}>
+            <Button variant="ghost" onClick={() => { setEditing(null); setImages([]); setUploadResult(null); }}>
               Cancel
             </Button>
           </div>

@@ -3,10 +3,10 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
 import { siteConfig } from "@/config/site";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { createClient } from "@/lib/supabase/server";
+import { PropertyCarousel } from "@/components/properties/PropertyCarousel";
 
 export const dynamic = "force-dynamic";
 
@@ -163,73 +163,8 @@ function FeaturedListings({ properties }: { properties: FeaturedProperty[] }) {
           </p>
         </div>
 
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {properties.map((property) => {
-            const mainImage = property.property_images?.sort(
-              (a, b) => a.sort_order - b.sort_order
-            )[0];
-
-            return (
-              <Link
-                key={property.id}
-                href={`/properties/${property.id}`}
-                className="group relative overflow-hidden rounded-2xl border border-secondary-700/50 bg-secondary-900 transition-all duration-300 hover:-translate-y-1 hover:border-primary-600/50 hover:shadow-2xl hover:shadow-primary-500/10"
-              >
-                {/* Image area */}
-                <div className="relative h-52 overflow-hidden">
-                  {mainImage ? (
-                    <img
-                      src={mainImage.image_url}
-                      alt={property.title}
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600/80 via-primary-700/60 to-primary-900/80">
-                      <svg className="h-16 w-16 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                      </svg>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <div className="mb-1 inline-block rounded-full bg-primary-500 px-3 py-1 text-xs font-bold text-white">
-                      {property.price}
-                    </div>
-                    <h3 className="text-xl font-bold text-white drop-shadow-lg">
-                      {property.title}
-                    </h3>
-                  </div>
-                  <div className="absolute right-4 top-4">
-                    <Badge variant={property.status === "available" ? "success" : "default"}>
-                      {property.status === "available" ? "For Rent" : "Rented"}
-                    </Badge>
-                  </div>
-                </div>
-
-                {/* Details */}
-                <div className="p-6">
-                  <p className="mb-3 text-sm font-medium text-secondary-400">
-                    {property.address}, {property.city}, {property.state}
-                  </p>
-                  <div className="flex items-center gap-4 text-sm text-secondary-300">
-                    <span className="flex items-center gap-1.5">
-                      <svg className="h-4 w-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5M3.75 3v18m16.5-18v18M5.25 3h13.5M5.25 21V6.75a.75.75 0 01.75-.75h12a.75.75 0 01.75.75V21" />
-                      </svg>
-                      {property.bedrooms} {property.bedrooms === 1 ? "Bed" : "Beds"}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <svg className="h-4 w-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {property.bathrooms} {property.bathrooms === 1 ? "Bath" : "Baths"}
-                    </span>
-                    <span className="text-secondary-500">{property.property_type}</span>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+        <div className="mt-12">
+          <PropertyCarousel properties={properties} />
         </div>
 
         <div className="mt-10 text-center">
@@ -395,27 +330,17 @@ export default async function HomePage() {
 
   try {
     const supabase = await createClient();
+    const selectFields =
+      "id, title, address, city, state, price, bedrooms, bathrooms, property_type, status, featured, property_images(image_url, sort_order)";
 
-    // First try to get featured properties
-    const { data: featured } = await supabase
+    // Get all properties, featured first, then by date
+    const { data: all } = await supabase
       .from("properties")
-      .select("id, title, address, city, state, price, bedrooms, bathrooms, property_type, status, property_images(image_url, sort_order)")
-      .eq("featured", true)
-      .order("created_at", { ascending: false })
-      .limit(6);
+      .select(selectFields)
+      .order("featured", { ascending: false })
+      .order("created_at", { ascending: false });
 
-    if (featured && featured.length > 0) {
-      featuredProperties = featured;
-    } else {
-      // Fallback: show most recent properties if none are featured
-      const { data: recent } = await supabase
-        .from("properties")
-        .select("id, title, address, city, state, price, bedrooms, bathrooms, property_type, status, property_images(image_url, sort_order)")
-        .order("created_at", { ascending: false })
-        .limit(6);
-
-      featuredProperties = recent || [];
-    }
+    featuredProperties = all || [];
   } catch {
     // Supabase not configured — featured section will be hidden
   }

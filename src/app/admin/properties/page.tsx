@@ -20,6 +20,7 @@ interface Property {
   square_feet: number | null;
   property_type: string;
   status: string;
+  featured: boolean;
   image_count: number;
   created_at: string;
 }
@@ -124,6 +125,7 @@ export default function AdminPropertiesPage() {
       square_feet: null,
       property_type: "Apartment",
       status: "available",
+      featured: false,
     });
   };
 
@@ -340,6 +342,22 @@ export default function AdminPropertiesPage() {
               </div>
             </div>
             <div className="sm:col-span-2">
+              <label className="flex items-center gap-3 text-sm text-secondary-300">
+                <input
+                  type="checkbox"
+                  checked={!!editing.featured}
+                  onChange={(e) =>
+                    setEditing({ ...editing, featured: e.target.checked })
+                  }
+                  className="h-4 w-4 rounded border-secondary-600 bg-secondary-800 text-primary-500 focus:ring-primary-500"
+                />
+                <span>
+                  <strong className="text-white">Featured on Home Page</strong>
+                  <span className="ml-2 text-secondary-500">— This property will appear in the featured section on the main page</span>
+                </span>
+              </label>
+            </div>
+            <div className="sm:col-span-2">
               <label className="mb-1 block text-sm text-secondary-300">
                 Description
               </label>
@@ -387,6 +405,9 @@ export default function AdminPropertiesPage() {
                     >
                       {p.status}
                     </Badge>
+                    {p.featured && (
+                      <Badge variant="primary">Featured</Badge>
+                    )}
                   </div>
                   <p className="text-sm text-secondary-400">
                     {p.address}, {p.city}, {p.state} {p.zip}

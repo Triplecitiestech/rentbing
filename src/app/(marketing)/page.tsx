@@ -3,8 +3,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { Card } from "@/components/ui/Card";
+import { Badge } from "@/components/ui/Badge";
 import { siteConfig } from "@/config/site";
 import { ContactForm } from "@/components/forms/ContactForm";
+import { createClient } from "@/lib/supabase/server";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "RentBing — Off-Campus Student Housing Near Binghamton University",
@@ -128,34 +132,21 @@ function StatsBar() {
   );
 }
 
-function FeaturedListings() {
-  const listings = [
-    {
-      title: "Two Bedrooms",
-      price: "From $700/bedroom",
-      address: "132 & 139 Washington St",
-      features: ["Downtown Location", "Near Campus", "Laundry On-Site"],
-      gradient: "from-primary-600/80 via-primary-700/60 to-primary-900/80",
-      accent: "bg-primary-500",
-    },
-    {
-      title: "Studios & One Bedrooms",
-      price: "From $975/month",
-      address: "139 & 257 Washington St",
-      features: ["Perfect for Grad Students", "Private Living", "All Utilities Options"],
-      gradient: "from-primary-500/60 via-emerald-700/40 to-secondary-900/80",
-      accent: "bg-primary-400",
-    },
-    {
-      title: "Large Multi-Bedrooms",
-      price: "From $600/person",
-      address: "135 Washington & Court St",
-      features: ["Great for Groups", "4-7+ Bedrooms", "Utilities Included Options"],
-      gradient: "from-emerald-600/50 via-teal-800/40 to-secondary-900/80",
-      accent: "bg-accent-emerald",
-    },
-  ];
+interface FeaturedProperty {
+  id: string;
+  title: string;
+  address: string;
+  city: string;
+  state: string;
+  price: string;
+  bedrooms: number;
+  bathrooms: number;
+  property_type: string;
+  status: string;
+  property_images: { image_url: string; sort_order: number }[];
+}
 
+function FeaturedListings({ properties }: { properties: FeaturedProperty[] }) {
   return (
     <section className="bg-secondary-950 py-16 sm:py-20 lg:py-24">
       <Container>
@@ -173,47 +164,72 @@ function FeaturedListings() {
         </div>
 
         <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {listings.map((listing) => (
-            <div
-              key={listing.title}
-              className="group relative overflow-hidden rounded-2xl border border-secondary-700/50 bg-secondary-900 transition-all duration-300 hover:-translate-y-1 hover:border-primary-600/50 hover:shadow-2xl hover:shadow-primary-500/10"
-            >
-              {/* Gradient image area */}
-              <div
-                className={`relative h-52 bg-gradient-to-br ${listing.gradient} flex items-end p-6`}
-              >
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(255,255,255,0.1)_0%,_transparent_60%)]" />
-                <div className="relative">
-                  <div
-                    className={`mb-2 inline-block rounded-full ${listing.accent} px-3 py-1 text-xs font-bold text-white`}
-                  >
-                    {listing.price}
-                  </div>
-                  <h3 className="text-2xl font-bold text-white drop-shadow-lg">
-                    {listing.title}
-                  </h3>
-                </div>
-              </div>
+          {properties.map((property) => {
+            const mainImage = property.property_images?.sort(
+              (a, b) => a.sort_order - b.sort_order
+            )[0];
 
-              {/* Details */}
-              <div className="p-6">
-                <p className="mb-4 text-sm font-medium text-secondary-400">
-                  {listing.address}
-                </p>
-                <ul className="space-y-2">
-                  {listing.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-center gap-2 text-sm text-secondary-300"
-                    >
-                      <svg className="h-4 w-4 shrink-0 text-primary-400" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z" clipRule="evenodd" /></svg>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          ))}
+            return (
+              <Link
+                key={property.id}
+                href={`/properties/${property.id}`}
+                className="group relative overflow-hidden rounded-2xl border border-secondary-700/50 bg-secondary-900 transition-all duration-300 hover:-translate-y-1 hover:border-primary-600/50 hover:shadow-2xl hover:shadow-primary-500/10"
+              >
+                {/* Image area */}
+                <div className="relative h-52 overflow-hidden">
+                  {mainImage ? (
+                    <img
+                      src={mainImage.image_url}
+                      alt={property.title}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600/80 via-primary-700/60 to-primary-900/80">
+                      <svg className="h-16 w-16 text-white/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                      </svg>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <div className="mb-1 inline-block rounded-full bg-primary-500 px-3 py-1 text-xs font-bold text-white">
+                      {property.price}
+                    </div>
+                    <h3 className="text-xl font-bold text-white drop-shadow-lg">
+                      {property.title}
+                    </h3>
+                  </div>
+                  <div className="absolute right-4 top-4">
+                    <Badge variant={property.status === "available" ? "success" : "default"}>
+                      {property.status === "available" ? "For Rent" : "Rented"}
+                    </Badge>
+                  </div>
+                </div>
+
+                {/* Details */}
+                <div className="p-6">
+                  <p className="mb-3 text-sm font-medium text-secondary-400">
+                    {property.address}, {property.city}, {property.state}
+                  </p>
+                  <div className="flex items-center gap-4 text-sm text-secondary-300">
+                    <span className="flex items-center gap-1.5">
+                      <svg className="h-4 w-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5M3.75 3v18m16.5-18v18M5.25 3h13.5M5.25 21V6.75a.75.75 0 01.75-.75h12a.75.75 0 01.75.75V21" />
+                      </svg>
+                      {property.bedrooms} {property.bedrooms === 1 ? "Bed" : "Beds"}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <svg className="h-4 w-4 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      {property.bathrooms} {property.bathrooms === 1 ? "Bath" : "Baths"}
+                    </span>
+                    <span className="text-secondary-500">{property.property_type}</span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
 
         <div className="mt-10 text-center">
@@ -374,12 +390,43 @@ function ContactSection() {
   );
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  let featuredProperties: FeaturedProperty[] = [];
+
+  try {
+    const supabase = await createClient();
+
+    // First try to get featured properties
+    const { data: featured } = await supabase
+      .from("properties")
+      .select("id, title, address, city, state, price, bedrooms, bathrooms, property_type, status, property_images(image_url, sort_order)")
+      .eq("featured", true)
+      .order("created_at", { ascending: false })
+      .limit(6);
+
+    if (featured && featured.length > 0) {
+      featuredProperties = featured;
+    } else {
+      // Fallback: show most recent properties if none are featured
+      const { data: recent } = await supabase
+        .from("properties")
+        .select("id, title, address, city, state, price, bedrooms, bathrooms, property_type, status, property_images(image_url, sort_order)")
+        .order("created_at", { ascending: false })
+        .limit(6);
+
+      featuredProperties = recent || [];
+    }
+  } catch {
+    // Supabase not configured — featured section will be hidden
+  }
+
   return (
     <>
       <HeroSection />
       <StatsBar />
-      <FeaturedListings />
+      {featuredProperties.length > 0 && (
+        <FeaturedListings properties={featuredProperties} />
+      )}
       <WhyRentBing />
       <ContactSection />
     </>

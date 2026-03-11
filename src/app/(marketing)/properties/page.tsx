@@ -85,11 +85,15 @@ export default async function PropertiesPage() {
                 .slice(0, 4);
 
               return (
-                <Card
+                <Link
                   key={property.id}
+                  href={`/properties/${property.id}`}
+                  className="group block"
+                >
+                <Card
                   variant="glass"
                   padding="none"
-                  className="overflow-hidden"
+                  className="overflow-hidden transition-all duration-300 group-hover:border-primary-600/50 group-hover:shadow-2xl group-hover:shadow-primary-500/10"
                 >
                   <div className="flex flex-col sm:flex-row">
                     {/* Image section */}
@@ -151,15 +155,14 @@ export default async function PropertiesPage() {
                         <p className="text-lg font-bold text-primary-400">
                           {property.price}
                         </p>
-                        <Link href={`/properties/${property.id}`}>
-                          <Button variant="outline" size="sm">
-                            See full details
-                          </Button>
-                        </Link>
+                        <Button variant="outline" size="sm">
+                          See full details
+                        </Button>
                       </div>
                     </div>
                   </div>
                 </Card>
+                </Link>
               );
             })}
           </div>

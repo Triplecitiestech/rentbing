@@ -11,6 +11,7 @@ import {
   RentalPropertyJsonLd,
   BreadcrumbJsonLd,
 } from "@/components/seo/JsonLd";
+import { cn } from "@/utils/cn";
 
 interface PropertyDetail {
   id: string;
@@ -132,41 +133,41 @@ export default async function PropertyDetailPage({ params }: PageProps) {
       <Container className="relative z-10 -mt-16 pb-16">
         {/* Title card */}
         <div className="rounded-xl border border-secondary-700/50 bg-secondary-900/95 p-6 backdrop-blur sm:p-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold sm:text-3xl">{prop.title}</h1>
-                <Badge variant={prop.status === "available" ? "success" : "default"}>
-                  {prop.status === "available" ? "For Rent" : "Rented"}
-                </Badge>
-              </div>
-              <p className="mt-2 text-secondary-400">
-                {prop.address}, {prop.city}, {prop.state} {prop.zip}
-              </p>
+          {/* Title row */}
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold sm:text-3xl">{prop.title}</h1>
+              <Badge variant={prop.status === "available" ? "success" : "default"}>
+                {prop.status === "available" ? "For Rent" : "Rented"}
+              </Badge>
             </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-primary-400">{prop.price}</p>
-            </div>
+            <p className="text-2xl font-bold text-primary-400 sm:text-3xl">{prop.price}</p>
           </div>
+          <p className="mt-2 text-secondary-400">
+            {prop.address}, {prop.city}, {prop.state} {prop.zip}
+          </p>
 
           {/* Details grid */}
-          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            <div className="rounded-lg bg-secondary-800/50 p-3 text-center">
-              <p className="text-xs text-secondary-400">Bedrooms</p>
-              <p className="text-lg font-bold">{prop.bedrooms}</p>
+          <div className={cn(
+            "mt-6 grid gap-4",
+            prop.square_feet ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-3"
+          )}>
+            <div className="rounded-lg border border-secondary-700/50 bg-secondary-800/50 p-4 text-center">
+              <p className="text-xs uppercase tracking-wider text-secondary-400">Bedrooms</p>
+              <p className="mt-1 text-xl font-bold">{prop.bedrooms}</p>
             </div>
-            <div className="rounded-lg bg-secondary-800/50 p-3 text-center">
-              <p className="text-xs text-secondary-400">Bathrooms</p>
-              <p className="text-lg font-bold">{prop.bathrooms}</p>
+            <div className="rounded-lg border border-secondary-700/50 bg-secondary-800/50 p-4 text-center">
+              <p className="text-xs uppercase tracking-wider text-secondary-400">Bathrooms</p>
+              <p className="mt-1 text-xl font-bold">{prop.bathrooms}</p>
             </div>
-            <div className="rounded-lg bg-secondary-800/50 p-3 text-center">
-              <p className="text-xs text-secondary-400">Type</p>
-              <p className="text-lg font-bold">{prop.property_type}</p>
+            <div className="rounded-lg border border-secondary-700/50 bg-secondary-800/50 p-4 text-center">
+              <p className="text-xs uppercase tracking-wider text-secondary-400">Type</p>
+              <p className="mt-1 text-xl font-bold capitalize">{prop.property_type}</p>
             </div>
             {prop.square_feet && (
-              <div className="rounded-lg bg-secondary-800/50 p-3 text-center">
-                <p className="text-xs text-secondary-400">Sq Ft</p>
-                <p className="text-lg font-bold">{prop.square_feet.toLocaleString()}</p>
+              <div className="rounded-lg border border-secondary-700/50 bg-secondary-800/50 p-4 text-center">
+                <p className="text-xs uppercase tracking-wider text-secondary-400">Sq Ft</p>
+                <p className="mt-1 text-xl font-bold">{prop.square_feet.toLocaleString()}</p>
               </div>
             )}
           </div>
@@ -179,15 +180,15 @@ export default async function PropertyDetailPage({ params }: PageProps) {
           )}
 
           {/* CTA */}
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Link href="/contact">
-              <Button size="lg">Inquire About This Property</Button>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Link href="/contact" className="sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto">Inquire About This Property</Button>
             </Link>
-            <a href={siteConfig.externalLinks.application} target="_blank" rel="noopener noreferrer">
-              <Button variant="outline" size="lg">Apply Now</Button>
+            <a href={siteConfig.externalLinks.application} target="_blank" rel="noopener noreferrer" className="sm:w-auto">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto">Apply Now</Button>
             </a>
-            <a href={`tel:${siteConfig.phone}`}>
-              <Button variant="ghost" size="lg">{siteConfig.phone}</Button>
+            <a href={`tel:${siteConfig.phone}`} className="sm:w-auto">
+              <Button variant="ghost" size="lg" className="w-full sm:w-auto">{siteConfig.phone}</Button>
             </a>
           </div>
         </div>

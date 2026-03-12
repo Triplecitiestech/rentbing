@@ -136,28 +136,28 @@ export default async function PropertiesPage() {
                             {property.status === "available" ? "For Rent" : "Rented"}
                           </Badge>
                         </div>
-                        <div className="mt-2 space-y-1 text-sm text-secondary-400">
-                          <p>
-                            <span className="font-medium text-secondary-300">Property Type:</span>{" "}
-                            {property.property_type}
-                          </p>
-                          <p>
-                            <span className="font-medium text-secondary-300">Sale/Rent:</span>{" "}
-                            For Rent
-                          </p>
-                          <p>
-                            <span className="font-medium text-secondary-300">Bedrooms:</span>{" "}
-                            {property.bedrooms}
-                          </p>
+                        <div className="mt-3 flex flex-wrap gap-3 text-sm text-secondary-300">
+                          <span className="inline-flex items-center gap-1.5">
+                            <svg className="h-4 w-4 text-secondary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                            </svg>
+                            {property.bedrooms} {property.bedrooms === 1 ? "Bed" : "Beds"}
+                          </span>
+                          <span className="text-secondary-600">·</span>
+                          <span className="inline-flex items-center gap-1.5">
+                            {property.bathrooms} {property.bathrooms === 1 ? "Bath" : "Baths"}
+                          </span>
+                          <span className="text-secondary-600">·</span>
+                          <span className="capitalize">{property.property_type}</span>
                         </div>
                       </div>
                       <div className="mt-4 flex items-center justify-between">
                         <p className="text-lg font-bold text-primary-400">
                           {property.price}
                         </p>
-                        <Button variant="outline" size="sm">
-                          See full details
-                        </Button>
+                        <span className="text-sm font-medium text-primary-400 transition-colors group-hover:text-primary-300">
+                          View details →
+                        </span>
                       </div>
                     </div>
                   </div>

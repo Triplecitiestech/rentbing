@@ -3,6 +3,7 @@ import { siteConfig } from "@/config/site";
 export const mainNavigation = [
   { label: "Properties", href: "/properties" },
   { label: "Maintenance", href: "/maintenance" },
+  { label: "FAQ", href: "/#faq" },
   { label: "Contact", href: "/contact" },
 ] as const;
 

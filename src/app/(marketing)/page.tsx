@@ -7,6 +7,7 @@ import { siteConfig } from "@/config/site";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { createClient } from "@/lib/supabase/server";
 import { PropertyCarousel } from "@/components/properties/PropertyCarousel";
+import { FaqAccordion } from "@/components/shared/FaqAccordion";
 
 export const dynamic = "force-dynamic";
 
@@ -330,6 +331,82 @@ function WhyRentBing() {
   );
 }
 
+function FaqSection() {
+  const faqs = [
+    {
+      question: "How do I apply for an apartment?",
+      answer:
+        "You can apply online through our Buildium portal. Click the \"Apply Now\" button on any property page or visit our application link directly. The process takes just a few minutes and you'll hear back from us quickly.",
+    },
+    {
+      question: "When does the lease start and end?",
+      answer:
+        "Most leases run from August to August, aligning with the Binghamton University academic year. We also offer flexible lease terms depending on availability — contact us to discuss your needs.",
+    },
+    {
+      question: "What's included in the rent?",
+      answer:
+        "This varies by property. Some units include water, trash, and common area utilities. Check the specific property listing for details or contact us and we'll break down exactly what's covered.",
+    },
+    {
+      question: "Are pets allowed?",
+      answer:
+        "We offer pet-friendly options at select properties. Pet deposits and monthly pet rent may apply. Reach out to us with details about your pet and we'll let you know which properties are available.",
+    },
+    {
+      question: "How do I submit a maintenance request?",
+      answer:
+        "You can submit maintenance requests directly through our website on the Maintenance page. Describe the issue, attach a photo if helpful, and our team will respond promptly. For emergencies, call us at 607-484-7654.",
+    },
+    {
+      question: "How far are the properties from Binghamton University?",
+      answer:
+        "All of our properties are in Downtown Binghamton, just minutes from campus by car or bus. Most are along major bus routes with direct service to BU.",
+    },
+    {
+      question: "Can I schedule a tour before applying?",
+      answer:
+        "Absolutely! We encourage prospective tenants to see the property in person. Contact us by phone or through our contact form and we'll set up a time that works for you.",
+    },
+    {
+      question: "Is parking available?",
+      answer:
+        "Parking availability varies by property. Many of our locations include off-street parking. Check the property listing or ask us for specifics.",
+    },
+  ];
+
+  return (
+    <section className="bg-gradient-to-b from-[#0a0f1e] to-secondary-950 py-16 sm:py-20 lg:py-24" id="faq">
+      <Container>
+        <div className="mx-auto max-w-3xl">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold sm:text-4xl">
+              Frequently Asked{" "}
+              <span className="text-primary-400">Questions</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-secondary-400">
+              Everything you need to know about renting with RentBing.
+            </p>
+          </div>
+
+          <div className="mt-10 rounded-xl border border-secondary-700/50 bg-secondary-900/50 px-6">
+            <FaqAccordion items={faqs} />
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-secondary-400">
+              Still have questions?{" "}
+              <Link href="/contact" className="font-medium text-primary-400 hover:text-primary-300">
+                Get in touch
+              </Link>
+            </p>
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+}
+
 function ContactSection() {
   return (
     <section className="bg-[#0a0f1e] py-16 sm:py-20 lg:py-24" id="contact">
@@ -441,6 +518,7 @@ export default async function HomePage() {
         <FeaturedListings properties={featuredProperties} />
       )}
       <WhyRentBing />
+      <FaqSection />
       <ContactSection />
     </>
   );
